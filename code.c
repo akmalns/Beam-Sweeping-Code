@@ -55,6 +55,7 @@ int findH_min(int i,int C,int j, int T, int P1, int P2){
         hmin = (int) ceil((i-x-P2) - W_BO_per_sigma);
     }else if((i%T%(j+P1))<(j+P1) && ((float)i/T)<1 && (abs(i%T%(j+P1)-1))<j && i%T%(j+P1)!=0){ //Case 3
         printf("This is case 3\n");
+        x=i%T%(j+P2);
         hmin = (int) ceil((i-x+1) - W_BO_per_sigma);
     }else{
         printf("Out of Case");
@@ -64,9 +65,13 @@ int findH_min(int i,int C,int j, int T, int P1, int P2){
     return hmin;
 }
 
-int findH_max(int C, int T, int T1, int T2, int i){
+int findH_max(int i,int C,int j, int T, int P1, int P2){
     int x;
     int hmax;
+
+    if(P2==0){
+        P2=P1;
+    }
 
     /*
     Case 1 : h will backoff in the 2nd up to Nth frame in a multiframe
@@ -80,16 +85,20 @@ int findH_max(int C, int T, int T1, int T2, int i){
     Case 3 : h will backoff in the very first frame in the very first multiframe
     Note : the minimum value of h will be right before h+Wbo equal to i
     */
-    if((i%T)>T1 && (i%T)<(T-T2)){ //Case 1
-        x=i%T%T1;
+    if((i%T)>(j+P1) && (abs(i%T%(j+P1)-1))<j && i%T%(j+P1)!=0){ //Case 1
+        printf("This is case 1\n");
+        x=i%T%(j+P1);
         hmax = (int) floor((i-x+1)-(W_BO_per_sigma));
-    }else if((i%T)<T1 && (i/T)>1){ //Case 2
-        x=i%T%T2;
+    }else if((i%T%(j+P1))<(j+P1) && ((float)i/T)>1 && (abs(i%T%(j+P1)-1))<j && i%T%(j+P1)!=0){ //Case 2
+        printf("This is case 2\n");
+        x=i%T%(j+P2);
         hmax = (int) floor((i-x+1)-(W_BO_per_sigma));
-    }else if((i%T)<T1 && (i/T)<1){ //Case 3
-        x=i%T%T1;
+    }else if((i%T%(j+P1))<(j+P1) && ((float)i/T)<1 && (abs(i%T%(j+P1)-1))<j && i%T%(j+P1)!=0){ //Case 3
+        printf("This is case 3\n");
+        x=i%T%(j+P1);
         hmax = (int) floor((i-x+1)-(W_BO_per_sigma));
     }else{
+        printf("Out of Case\n");
         hmax=-1;
     }
     
@@ -100,13 +109,24 @@ int findH_max(int C, int T, int T1, int T2, int i){
 int main(){
     //Testing hmin function
 
+    // int i=0;
+    // while(i!=-999){
+    //     printf("Insert i : ");
+    // scanf("%d",&i);
+
+    // printf("%d\n",findH_min(i,1,6,60,54,0));
+    // }
+    
+
+    //Testing hmax function
+
     int i=0;
     while(i!=-999){
         printf("Insert i : ");
-        scanf("%d",&i);
+    scanf("%d",&i);
 
-        printf("%d\n",findH_min(i,1,6,60,54,0));
+    printf("%d\n",findH_max(i,1,6,60,54,0));
     }
-    
+
 }
 
