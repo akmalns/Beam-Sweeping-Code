@@ -1,2 +1,6 @@
 a.exe
 test.c
+code.o
+test.o
+testprogram.exe
+.vscode
