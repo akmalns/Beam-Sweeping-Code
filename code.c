@@ -211,11 +211,11 @@ float calculate_Alpha(int h, int hmin, int hmax, int i, int C, int j, int T, int
 float calculate_Beta(int h, int hmin, int hmax, int i, int C, int j, int T, int T1, int T2){
     float beta=0;
     int P1 = T1-j;
-    int P2 = C==1 ? 0 : T2-j;
+    int P2 = C==1 ? P1 : T2-j;
     int x;
 
     /*
-    Case 1 : h will backoff in the 2nd until the Nth frame in a multiframe
+    Case 1 : h will backoff in the 2nd until Nth frame in a multiframe
     Note : The non-RA time slot will be P1
     This case will happen if i located in the 2nd up to nth frame in a multiframe
     Alpha will be calculated from h
@@ -229,34 +229,81 @@ float calculate_Beta(int h, int hmin, int hmax, int i, int C, int j, int T, int 
     */
 
     if(hmin<0 && hmax<0){   //Check the value of h
+        printf("hmin and hmax < 0\n");
+        beta=0;
+    }else if(h<0){
+        printf("h < 0\n");
         beta=0;
     }else if(h<hmin || h>hmax){
+        printf("h out of range\n");
         beta=0;
     }else{
-        if((i%T)>(j+P1) && (abs(i%T%(j+P1)-1))<j && i%T%(j+P1)!=0){ //Case 1
-
+        if((i%T)>(j+P1) && (abs(i%T%(j+P1)-1))<j && i%T%(j+P1)!=0 && (i%T)<(T-P2+1)){ //Case 1
+            // condition 1 to make sure the i is greater than T1 (located on the 2nd - nth frame)
+            // condition 2 to make sure the i is still in the RA Slot
+            // condition 3 to make sure the i is not the multiplication of T1 (the last element of T1 should not be RA Slot)
+            // condition 4 to make sure the i is not in the Non-RA slot of T2
+            printf("Case 1\n");
             x = i%T%T1;
-
-            if(i-x+1-W_BO_per_sigma<h && h<i-x-P1){
-                for(int p=1;p<minimum((float)(h+W_BO_per_sigma),(float)(x));p++){
-                    beta+=(float)(1/(j-p))*sigma*1/W_BO;
+            if(i-x+1-W_BO_per_sigma<h && h<=i-x-P1){ // Make Sure h still in the range given by the equation
+                for(int p=maximum(0,h-i+x-1);p<minimum(x-1,h+W_BO_per_sigma-i+x-1);p++){
+                    beta+=((float)1/(j-p-1));
                 }
-            }
-            
-            
-        }else if((i%T%(j+P1))<(j+P1) && ((float)i/T)>1 && (abs(i%T%(j+P1)-1))<j && i%T%(j+P1)!=0){ //Case 2
+                beta = beta/W_BO_per_sigma;
+            }else if(i-x+1<=h && h<=i-1){
+                for(int p=maximum(0,h-i+x-1);p<minimum(x-1,h+W_BO_per_sigma-i+x-1);p++){
+                    beta+=((float)1/(j-p-1));
+                }
+                beta = beta/W_BO_per_sigma;
+            }   //otherwise, beta remain unchanged (0 value from the initialization)
 
+        }else if((i%T%(j+P1))<(j+P1) && ((float)i/T)>1 && (abs(i%T%(j+P1)-1))<j && i%T%(j+P1)!=0 && (i%T)<(T-P2+1)){ //Case 2
+            // condition 1 to make sure the i is located in the first frame (i%T<T1)
+            // condition 2 to make sure the i is not the first multiframe (one multiframe length is T, so i/T must be more than 1)
+            // condition 3 to make sure the i is still in the RA Slot
+            // condition 4 to make sure the i is note the multiplication of T1 (because T,2T,3T is not RA slot but the last slot of Non-RA Slot)
+            // condition 5 to make sure i is not in the Non-RA slot of T2
+            printf("Case 2\n");
             x = i%T%T1;
-            
-        }else if((i%T%(j+P1))<(j+P1) && ((float)i/T)<1 && (abs(i%T%(j+P1)-1))<j && i%T%(j+P1)!=0){ //Case 3
+            if(i-x+1-W_BO_per_sigma<h && h<i-1){ // Make Sure h still in the range given by the equation
+                for(int p=maximum(0,h-i+x-1);p<minimum(x-1,h+W_BO_per_sigma-i+x-1);p++){
+                    beta+=((float)1/(j-p-1));
+                }
+                beta = beta/W_BO_per_sigma;
+            }else if(i-x+1<=h && h<=i-1){
+                for(int p=maximum(0,h-i+x-1);p<minimum(x-1,h+W_BO_per_sigma-i+x-1);p++){
+                    beta+=((float)1/(j-p-1));
+                }
+                beta = beta/W_BO_per_sigma;
+            }   //otherwise, beta remain unchanged (0 value from the initialization)
 
-            
+        }else if((i%T%(j+P1))<(j+P1) && ((float)i/T)<1 && (abs(i%T%(j+P1)-1))<j && i%T%(j+P1)!=0 && (i%T)<(T-P2+1)){ //Case 3
+            // condition 1 to make sure the i is located in the first frame (i%T<T1)
+            // condition 2 to make sure the i is in the first multiframe (one multiframe length is T, so i/T must be less than 1)
+            // condition 3 to make sure the i is still in the RA Slot
+            // condition 4 to make sure the i is note the multiplication of T1 (because T,2T,3T is not RA slot but the last slot of Non-RA Slot)
+            // condition 5 to make sure i is not in the Non-RA slot of T2
+            printf("Case 3\n");
+            x = i%T%T1;
+            if(i-x+1-W_BO_per_sigma<h && h<i-1){ // Make Sure h still in the range given by the equation
+                for(int p=maximum(0,h-i+x-1);p<minimum(x-1,h+W_BO_per_sigma-i+x-1);p++){
+                    beta+=((float)1/(j-p-1));
+                }
+                beta = beta/W_BO_per_sigma;
+            }else if(i-x+1<=h && h<=i-1){
+                for(int p=maximum(0,h-i+x-1);p<minimum(x-1,h+W_BO_per_sigma-i+x-1);p++){
+                    beta+=((float)1/(j-p-1));
+                }
+                beta = beta/W_BO_per_sigma;
+            }   //otherwise, beta remain unchanged (0 value from the initialization)
+
         }else{
-            
+            printf("Other Case\n");
+            beta = 0;
         }
     }
+        
 
     return beta;
 
 }
-
