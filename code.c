@@ -311,7 +311,7 @@ float calculate_Beta(int h, int hmin, int hmax, int i, int C, int j, int T, int 
 
 int total_contending_UE(int* slot, int maxAttempt){
     int temp=0;
-    for(int i=0;i<maxAttempt;i++){
+    for(int i=1;i<=maxAttempt;i++){
         temp+=slot[i];
     }
 
@@ -319,13 +319,13 @@ int total_contending_UE(int* slot, int maxAttempt){
 }
 
 void calculate_success_UE(int* contendingSlot, int* successSlot, int maxAttempt, int totalContendingUE, int channelNum){
-    for(int i=0;i<maxAttempt;i++){
+    for(int i=1;i<=maxAttempt;i++){
         successSlot[i]=(int) contendingSlot[i]*exp(-1*totalContendingUE/channelNum);
     }
 }
 
 void calculate_collided_UE(int* contendingSlot, int* collidedSlot, int maxAttempt, int totalContendingUE, int channelNum){
-    for(int i=0;i<maxAttempt;i++){
+    for(int i=1;i<=maxAttempt;i++){
         collidedSlot[i]=(int) contendingSlot[i]*(1-exp(-1*totalContendingUE/channelNum));
     }
 }
