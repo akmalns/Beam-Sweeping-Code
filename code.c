@@ -1,6 +1,7 @@
 #include "code.h"
 #include <stdio.h>
 #include <math.h>
+#include <stdlib.h>
 
 #define W_BO_per_sigma 240
 #define sigma 0.125/6
@@ -306,4 +307,51 @@ float calculate_Beta(int h, int hmin, int hmax, int i, int C, int j, int T, int 
 
     return beta;
 
+}
+
+int total_contending_UE(int* slot, int maxAttempt){
+    int temp=0;
+    for(int i=0;i<maxAttempt;i++){
+        temp+=slot[i];
+    }
+
+    return temp;
+}
+
+void calculate_success_UE(int* contendingSlot, int* successSlot, int maxAttempt, int totalContendingUE, int channelNum){
+    for(int i=0;i<maxAttempt;i++){
+        successSlot[i]=(int) contendingSlot[i]*exp(-1*totalContendingUE/channelNum);
+    }
+}
+
+void calculate_collided_UE(int* contendingSlot, int* collidedSlot, int maxAttempt, int totalContendingUE, int channelNum){
+    for(int i=0;i<maxAttempt;i++){
+        collidedSlot[i]=(int) contendingSlot[i]*(1-exp(-1*totalContendingUE/channelNum));
+    }
+}
+
+void calculate_contending_UE(int iPos, int* contendingSlot, int maxAttempt , int** collided_UE_array, int C, int j, int T, int T1, int T2){
+    float alpha;
+    float beta;
+    int P1 = T1-j;
+    int P2 = C==1 ? P1 : T2-j;
+    int hmin;
+    int hmax;
+    float temp=0;
+
+    for(int i=1;i<=maxAttempt;i++){
+        if(i==1){
+            contendingSlot[i]=0;
+        }else{
+            hmin = findH_min(iPos,C,j,T,P1,P2);
+            hmax = findH_max(iPos,C,j,T,P1,P2);
+            for(int h=minimum(1,hmin);h<=hmax;h++){
+                alpha=calculate_Alpha(h,hmin,hmax,iPos,C,j,T,T1,T2);
+                beta=calculate_Beta(h,hmin,hmax,iPos,C,j,T,T1,T2);
+                temp+=(alpha+beta)*collided_UE_array[h][i-1];
+            }
+            contendingSlot[i]=temp;
+        }
+
+    }
 }
