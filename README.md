@@ -8,4 +8,4 @@ gcc -Wall -c main_func.c
 gcc -o <program name> code.o main_func.o
 ```
 
-Change the <program name> with your preferred program name
+Change the "program name" with your preferred program name
