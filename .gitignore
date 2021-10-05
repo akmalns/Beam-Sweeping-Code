@@ -4,3 +4,9 @@ code.o
 test.o
 testprogram.exe
 .vscode
+mainFunc.exe
+main_func.o
+collided.csv
+contending.csv
+success.csv
+/Andys_note
