@@ -343,7 +343,7 @@ void calculate_contending_UE(int iPos, float* contendingSlot, int maxAttempt , f
     // printf("enter hmin hmax calculation\n");
     hmin = findH_min(iPos,C,j,T,P1,P2);
     hmax = findH_max(iPos,C,j,T,P1,P2);
-    for(int i=1;i<=maxAttempt;i++){
+    for(int i=1;i<=maxAttempt+1;i++){
         if(i==1){
             // printf("check point 1\n");
             contendingSlot[i]=0;

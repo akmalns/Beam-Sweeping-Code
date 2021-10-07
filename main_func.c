@@ -42,17 +42,17 @@ void main_func(int length, int reattempt, int m, int C, int j, int T, int T1, in
 
     //Calculating Mi, Mis, Mif for all i value
     for(int i=0;i<length+1;i++){
-        calculate_success_UE(contendingUE_array[i],successUE_array[i],reattempt,total_contending_UE(contendingUE_array[i],reattempt),R); //calculate success UE in a particular slot
-        calculate_collided_UE(contendingUE_array[i],collidedUE_array[i],reattempt,total_contending_UE(contendingUE_array[i],reattempt),R); //calculate collided UE in a particular slot
         if(i>1){
             calculate_contending_UE(i,contendingUE_array[i],3,collidedUE_array,C,j,T,T1,T2); //Calculate contending UE if i>1 (the first slot is the initial transmission of one-shot arrival process)
         }
+        calculate_success_UE(contendingUE_array[i],successUE_array[i],reattempt,total_contending_UE(contendingUE_array[i],reattempt),R); //calculate success UE in a particular slot
+        calculate_collided_UE(contendingUE_array[i],collidedUE_array[i],reattempt,total_contending_UE(contendingUE_array[i],reattempt),R); //calculate collided UE in a particular slot
     }
 
     printf("======This is contending UE======\n\n");
     
-    for(int i=0;i<length+1;i++){
-        for(int j=0;j<reattempt+2;j++){
+    for(int i=1;i<length+1;i++){
+        for(int j=1;j<reattempt+2;j++){
             printf("%f",contendingUE_array[i][j]);
             printf("\t");
         }
@@ -61,8 +61,8 @@ void main_func(int length, int reattempt, int m, int C, int j, int T, int T1, in
 
     printf("======This is Success UE======\n\n");
     
-    for(int i=0;i<length+1;i++){
-        for(int j=0;j<reattempt+2;j++){
+    for(int i=1;i<length+1;i++){
+        for(int j=1;j<reattempt+2;j++){
             printf("%f",successUE_array[i][j]);
             printf("\t");
         }
@@ -71,8 +71,8 @@ void main_func(int length, int reattempt, int m, int C, int j, int T, int T1, in
 
     printf("======This is Collided UE======\n\n");
     
-    for(int i=0;i<length+1;i++){
-        for(int j=0;j<reattempt+2;j++){
+    for(int i=1;i<length+1;i++){
+        for(int j=1;j<reattempt+2;j++){
             printf("%f",collidedUE_array[i][j]);
             printf("\t");
         }
