@@ -166,7 +166,7 @@ float calculate_Alpha(int h, int hmin, int hmax, int i, int C, int j, int T, int
             // condition 4 to make sure the i is not in the Non-RA slot of T2
             // printf("Case 1\n");
             x = i%T%T1;
-            if(i-x-P1-W_BO_per_sigma<h && h<i-x-P1){ // Make Sure h still in the range given by the equation
+            if(i-x-P1-W_BO_per_sigma<h && h<=i-x-P1){ // Make Sure h still in the range given by the equation
                 // printf("entered conditional\n");
                 alpha = (float) (1/j)*(minimum(h + W_BO_per_sigma,i-x+1)-maximum(i-x-P1,h))/W_BO_per_sigma;
                 // printf("alpha = %f\n",alpha);
@@ -180,7 +180,7 @@ float calculate_Alpha(int h, int hmin, int hmax, int i, int C, int j, int T, int
             // condition 5 to make sure i is not in the Non-RA slot of T2
             // printf("Case 2\n");
             x = i%T%T1;
-            if(i-x-P2-W_BO_per_sigma<h && h<i-x-P2){ // Make Sure h still in the range given by the equation
+            if(i-x-P2-W_BO_per_sigma<h && h<=i-x-P2){ // Make Sure h still in the range given by the equation
                 // printf("entered conditional\n");
                 alpha = ((float) 1/j)*(minimum(h + W_BO_per_sigma,i-x+1)-maximum(i-x-P2,h))/W_BO_per_sigma;
                 // printf("alpha = %f\n",alpha);
@@ -265,7 +265,7 @@ float calculate_Beta(int h, int hmin, int hmax, int i, int C, int j, int T, int 
             // condition 5 to make sure i is not in the Non-RA slot of T2
             // printf("Case 2\n");
             x = i%T%T1;
-            if(i-x+1-W_BO_per_sigma<h && h<i-1){ // Make Sure h still in the range given by the equation
+            if(i-x+1-W_BO_per_sigma<h && h<=i-1){ // Make Sure h still in the range given by the equation
                 for(int p=maximum(0,h-i+x-1);p<minimum(x-1,h+W_BO_per_sigma-i+x-1);p++){
                     beta+=((float)1/(j-p-1));
                 }
@@ -285,7 +285,7 @@ float calculate_Beta(int h, int hmin, int hmax, int i, int C, int j, int T, int 
             // condition 5 to make sure i is not in the Non-RA slot of T2
             // printf("Case 3\n");
             x = i%T%T1;
-            if(i-x+1-W_BO_per_sigma<h && h<i-1){ // Make Sure h still in the range given by the equation
+            if(i-x+1-W_BO_per_sigma<h && h<=i-1){ // Make Sure h still in the range given by the equation
                 for(int p=maximum(0,h-i+x-1);p<minimum(x-1,h+W_BO_per_sigma-i+x-1);p++){
                     beta+=((float)1/(j-p-1));
                 }
@@ -310,7 +310,7 @@ float calculate_Beta(int h, int hmin, int hmax, int i, int C, int j, int T, int 
 
 float total_contending_UE(float* slot, int maxAttempt){
     float temp=0;
-    for(int i=1;i<=maxAttempt+1;i++){
+    for(int i=1;i<=maxAttempt;i++){
         temp+=slot[i];
     }
 
@@ -318,13 +318,13 @@ float total_contending_UE(float* slot, int maxAttempt){
 }
 
 void calculate_success_UE(float* contendingSlot, float* successSlot, int maxAttempt, float totalContendingUE, int channelNum){
-    for(int i=1;i<=maxAttempt+1;i++){
+    for(int i=1;i<=maxAttempt;i++){
         successSlot[i]=contendingSlot[i]*exp(-1*totalContendingUE/channelNum);
     }
 }
 
 void calculate_collided_UE(float* contendingSlot, float* collidedSlot, int maxAttempt, float totalContendingUE, int channelNum){
-    for(int i=1;i<=maxAttempt+1;i++){
+    for(int i=1;i<=maxAttempt;i++){
         collidedSlot[i]=contendingSlot[i]*(1-exp(-1*totalContendingUE/channelNum));
     }
 }
@@ -343,10 +343,10 @@ void calculate_contending_UE(int iPos, float* contendingSlot, int maxAttempt , f
     // printf("enter hmin hmax calculation\n");
     hmin = findH_min(iPos,C,j,T,P1,P2);
     hmax = findH_max(iPos,C,j,T,P1,P2);
-    for(int i=1;i<=maxAttempt+1;i++){
+    for(int i=1;i<=maxAttempt;i++){
         if(i==1){
             // printf("check point 1\n");
-            contendingSlot[i]=0;
+            contendingSlot[i]+=0;
         }else{
             // printf("check point 2\n");
             for(int h=maximum(1,hmin);h<=hmax;h++){
@@ -365,14 +365,14 @@ void calculate_contending_UE(int iPos, float* contendingSlot, int maxAttempt , f
             }
             // printf("check point 3\n");
             // printf("temp value = %f\n",temp);
-            contendingSlot[i]=temp;
+            contendingSlot[i]+=temp;
             temp=0;
         }
 
     }
 }
 
-void writeToCSV(float** contending, float** success, float** collided,int length,int reattempt){
+void writeToCSV(float** contending, float** success, float** collided,int length,int maxAttempt){
     FILE *fp;
     
     /*=======Saving Contending UE Data=======*/
@@ -382,7 +382,7 @@ void writeToCSV(float** contending, float** success, float** collided,int length
         fprintf(fp,"%d,",j);
     }
     fprintf(fp,"\n");
-    for(int i=1;i<reattempt+2;i++){
+    for(int i=1;i<=maxAttempt;i++){
         fprintf(fp,"%d,",i);
         for(int j=1;j<length+1;j++){
             fprintf(fp,"%f,",contending[j][i]);
@@ -400,7 +400,7 @@ void writeToCSV(float** contending, float** success, float** collided,int length
         fprintf(fp,"%d,",j);
     }
     fprintf(fp,"\n");
-    for(int i=1;i<reattempt+2;i++){
+    for(int i=1;i<=maxAttempt;i++){
         fprintf(fp,"%d,",i);
         for(int j=1;j<length+1;j++){
             fprintf(fp,"%f,",success[j][i]);
@@ -418,7 +418,7 @@ void writeToCSV(float** contending, float** success, float** collided,int length
         fprintf(fp,"%d,",j);
     }
     fprintf(fp,"\n");
-    for(int i=1;i<reattempt+2;i++){
+    for(int i=1;i<=maxAttempt;i++){
         fprintf(fp,"%d,",i);
         for(int j=1;j<length+1;j++){
             fprintf(fp,"%f,",collided[j][i]);

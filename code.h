@@ -12,6 +12,6 @@ float total_contending_UE(float* slot, int maxAttempt);
 void calculate_success_UE(float* contendingSlot, float* successSlot, int maxAttempt, float totalContendingUE, int channelNum);
 void calculate_collided_UE(float* contendingSlot, float* collidedSlot, int maxAttempt, float totalContendingUE, int channelNum);
 void calculate_contending_UE(int iPos, float* contendingSlot, int maxAttempt , float** collided_UE_array, int C, int j, int T, int T1, int T2);
-void writeToCSV(float** contending, float** success, float** collided,int length,int reattempt);
+void writeToCSV(float** contending, float** success, float** collided,int length,int maxAttempt);
 
 #endif
